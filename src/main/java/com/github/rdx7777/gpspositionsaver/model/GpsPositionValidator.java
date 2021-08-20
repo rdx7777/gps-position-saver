@@ -3,6 +3,8 @@ package com.github.rdx7777.gpspositionsaver.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class GpsPositionValidator {
 
@@ -16,6 +18,8 @@ public class GpsPositionValidator {
         result.add(validateDeviceId(gpsPosition.getDeviceId()));
         result.add(validateLatitude(gpsPosition.getLatitude()));
         result.add(validateLongitude(gpsPosition.getLongitude()));
+
+        result = result.stream().filter(Objects::nonNull).collect(Collectors.toList());
 
         return result;
     }
