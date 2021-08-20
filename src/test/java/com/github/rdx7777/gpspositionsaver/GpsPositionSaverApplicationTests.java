@@ -9,5 +9,4 @@ class GpsPositionSaverApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

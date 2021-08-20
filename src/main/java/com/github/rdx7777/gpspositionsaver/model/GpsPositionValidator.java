@@ -8,7 +8,7 @@ public class GpsPositionValidator {
 
     public static List<String> validate(GpsPosition gpsPosition) {
         if (gpsPosition == null) {
-            return Collections.singletonList("Gps position cannot be null.");
+            return Collections.singletonList("GPS position cannot be null.");
         }
 
         List<String> result = new ArrayList<>();
