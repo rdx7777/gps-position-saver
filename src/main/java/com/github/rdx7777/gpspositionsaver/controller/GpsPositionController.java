@@ -28,14 +28,17 @@ public class GpsPositionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody GpsPositionRequest positionRequest) {
+    public ResponseEntity<?> add(@RequestBody (required = false) GpsPositionRequest positionRequest) {
         try {
+            if (positionRequest == null) {
+                return new ResponseEntity<>("Attempt to add null position.", HttpStatus.BAD_REQUEST);
+            }
             GpsPosition position = service.add(positionRequest);
             LoggerService.info(String.format("GPS position added successfully with id: %d. Device id: %s, latitude: %s, longitude: %s.",
                 position.getId(), position.getDeviceId(), position.getLatitude(), position.getLongitude()));
-            return ResponseEntity.ok(position);
+            return new ResponseEntity(position, HttpStatus.CREATED);
         } catch (ServiceOperationException e) {
-            LoggerService.error("Server internal error occurred when adding GPS position: " + e.getMessage() + " : " + e.getStatus());
+            LoggerService.error("An error occurred when adding GPS position: " + e.getMessage() + " : " + e.getStatus());
             return new ResponseEntity<>(e.getMessage(), e.getStatus());
         }
     }
@@ -52,7 +55,7 @@ public class GpsPositionController {
                 return new ResponseEntity<>(String.format("GPS position with id %d does not exist.", id), HttpStatus.NOT_FOUND);
             }
         } catch (ServiceOperationException e) {
-            LoggerService.error(String.format("Server internal error occurred when getting GPS position with id: %d. Details: ", id) + e.getMessage() + " : " + e.getStatus());
+            LoggerService.error(String.format("An error occurred when getting GPS position with id: %d. Details: ", id) + e.getMessage() + " : " + e.getStatus());
             return new ResponseEntity<>(e.getMessage(), e.getStatus());
         }
     }
@@ -69,7 +72,7 @@ public class GpsPositionController {
                 return new ResponseEntity<>(String.format("No GPS positions in database for device id %s.", id), HttpStatus.NOT_FOUND);
             }
         } catch (ServiceOperationException e) {
-            LoggerService.error(String.format("Server internal error occurred when getting all GPS positions for device id: %s. Details: ", id) + e.getMessage() + " : " + e.getStatus());
+            LoggerService.error(String.format("An error occurred when getting all GPS positions for device id: %s. Details: ", id) + e.getMessage() + " : " + e.getStatus());
             return new ResponseEntity<>(e.getMessage(), e.getStatus());
         }
     }

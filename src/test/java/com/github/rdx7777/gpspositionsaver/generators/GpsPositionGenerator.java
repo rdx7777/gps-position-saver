@@ -12,4 +12,22 @@ public class GpsPositionGenerator {
             .longitude(WordGenerator.getRandomWord())
             .build();
     }
+
+    public static GpsPosition getRandomGpsPositionWithNonNullId() {
+        return GpsPosition.builder()
+            .id(IdGenerator.getNextId())
+            .deviceId(WordGenerator.getRandomWord())
+            .latitude(WordGenerator.getRandomWord())
+            .longitude(WordGenerator.getRandomWord())
+            .build();
+    }
+
+    public static GpsPosition getRandomGpsPositionWithSpecificDeviceId(String deviceId) {
+        return GpsPosition.builder()
+            .id(IdGenerator.getNextId())
+            .deviceId(deviceId)
+            .latitude(WordGenerator.getRandomWord())
+            .longitude(WordGenerator.getRandomWord())
+            .build();
+    }
 }

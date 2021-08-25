@@ -14,15 +14,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.github.rdx7777.gpspositionsaver.generators.GpsPositionGenerator;
 import com.github.rdx7777.gpspositionsaver.generators.GpsPositionRequestGenerator;
+import com.github.rdx7777.gpspositionsaver.generators.WordGenerator;
 import com.github.rdx7777.gpspositionsaver.model.GpsPosition;
 import com.github.rdx7777.gpspositionsaver.model.GpsPositionMapper;
 import com.github.rdx7777.gpspositionsaver.model.GpsPositionRequest;
 import com.github.rdx7777.gpspositionsaver.repository.GpsPositionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -63,6 +68,22 @@ class GpsPositionServiceTest {
         assertThrows(ServiceOperationException.class, () -> service.add(null));
         verify(mapper).mapToGpsPosition(null);
         verify(repository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("setOfInvalidPositions")
+    void addMethodShouldThrowServiceOperationExceptionForInvalidPosition(GpsPositionRequest positionRequest) {
+        assertThrows(ServiceOperationException.class, () -> service.add(positionRequest));
+        verify(mapper).mapToGpsPosition(positionRequest);
+        verify(repository, never()).save(any());
+    }
+
+    private static Stream<Arguments> setOfInvalidPositions() {
+        return Stream.of(
+            Arguments.of(new GpsPositionRequest(WordGenerator.getRandomWord(), WordGenerator.getRandomWord(), null)),
+            Arguments.of(new GpsPositionRequest(WordGenerator.getRandomWord(), null, WordGenerator.getRandomWord())),
+            Arguments.of(new GpsPositionRequest(null, WordGenerator.getRandomWord(), WordGenerator.getRandomWord()))
+        );
     }
 
     @Test
