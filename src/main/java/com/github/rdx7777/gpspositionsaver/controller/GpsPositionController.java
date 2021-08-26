@@ -1,5 +1,11 @@
 package com.github.rdx7777.gpspositionsaver.controller;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -9,6 +15,7 @@ import com.github.rdx7777.gpspositionsaver.service.GpsPositionService;
 import com.github.rdx7777.gpspositionsaver.service.LoggerService;
 import com.github.rdx7777.gpspositionsaver.service.ServiceOperationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +35,21 @@ public class GpsPositionController {
     }
 
     @PostMapping("/add")
+    @ApiResponse(responseCode = "201",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(oneOf = GpsPosition.class)))
+    @ApiResponse(responseCode = "400",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Empty position", value = "Attempt to add null position.")
+            }))
+    @ApiResponse(responseCode = "500",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Server error", value = "Message of error.")
+            }))
     public ResponseEntity<?> add(@RequestBody (required = false) GpsPositionRequest positionRequest) {
         try {
             if (positionRequest == null) {
@@ -44,6 +66,21 @@ public class GpsPositionController {
     }
 
     @GetMapping("/{id}")
+    @ApiResponse(responseCode = "200",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(oneOf = GpsPosition.class)))
+    @ApiResponse(responseCode = "404",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Position does not exist", value = "GPS position with id %d does not exist.")
+            }))
+    @ApiResponse(responseCode = "500",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Server error", value = "Message of error.")
+            }))
     public ResponseEntity<?> getById(@PathVariable("id") Long id) {
         try {
             Optional<GpsPosition> position = service.getById(id);
@@ -61,6 +98,20 @@ public class GpsPositionController {
     }
 
     @GetMapping("/device/{id}")
+    @ApiResponse(responseCode = "200",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = GpsPosition.class))))
+    @ApiResponse(responseCode = "404",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Empty database", value = "No GPS positions in database for device id %s.")
+            }))
+    @ApiResponse(responseCode = "500",
+        content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
+            schema = @Schema(oneOf = String.class),
+            examples = {
+                @ExampleObject(name = "Server error", value = "Message of error.")
+            }))
     public ResponseEntity<?> getAllByDeviceId(@PathVariable("id") String id) {
         try {
             Collection<GpsPosition> positions = service.getAllByDeviceId(id);
